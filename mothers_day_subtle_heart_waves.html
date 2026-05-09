@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mother's Day Surprise</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<style>
+@keyframes floatUp {
+  0% { transform: translateY(100%) scale(0); opacity: 1; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-120%) scale(1.2); opacity: 0; }
+}
+@keyframes popIn {
+  0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+  60% { transform: scale(1.15) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(236,72,153,0.4); }
+  50% { box-shadow: 0 0 40px rgba(236,72,153,0.8); }
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.3); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.2); }
+}
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes confetti {
+  0% { transform: translate(0, -100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--tx), 100vh) rotate(360deg); opacity: 0; }
+}
+@keyframes orbitFlower {
+  0% { transform: translate(0,0) rotate(0deg) scale(0); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translate(var(--ox),var(--oy)) rotate(360deg) scale(1); opacity: 0; }
+}
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+@keyframes subtle-glow {
+  0%, 100% { filter: drop-shadow(0 0 15px rgba(236,72,153,0.3)); }
+  50% { filter: drop-shadow(0 0 30px rgba(236,72,153,0.6)); }
+}
+@keyframes slow-twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+@keyframes burstRing {
+  0% { transform: translate(-50%,-50%) scale(0.2); opacity: 0.85; }
+  100% { transform: translate(-50%,-50%) scale(2.8); opacity: 0; }
+}
+@keyframes softFlash {
+  0% { opacity: 0; }
+  20% { opacity: 0.3; }
+  100% { opacity: 0; }
+}
+@keyframes petalFall {
+  0% { transform: translate3d(0,-12vh,0) rotate(0deg); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate3d(var(--driftX),110vh,0) rotate(380deg); opacity: 0; }
+}
+@keyframes heartCenterReveal {
+  0% { opacity: 0.08; transform: translateY(22px) scale(0.94); filter: blur(10px) saturate(0.75); }
+  55% { opacity: 0.82; transform: translateY(10px) scale(0.98); filter: blur(4px) saturate(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0) saturate(1.04); }
+}
+
+/* ── SUBTLE HEART WAVE ── */
+@keyframes heartWaveOut {
+  0%   { transform: scale(0.01); opacity: 0; }
+  8%   { opacity: 0.35; }
+  100% { transform: scale(var(--hw-end-scale)); opacity: 0; }
+}
+.heart-wave-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.heart-wave-svg {
+  position: absolute;
+  left: calc(50% - 50px); top: 50%;
+  transform: translate(-50%, -50%) scale(0.01);
+  overflow: visible;
+  pointer-events: none;
+  animation: heartWaveOut ease-out forwards;
+}
+.heart-wave-svg path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.heart-photo-shell {
+  position: relative;
+  width: min(72vw, 320px);
+  aspect-ratio: 1/1;
+  display: grid;
+  place-items: center;
+}
+.heart-photo-glow {
+  position: absolute;
+  inset: -10px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(236,72,153,0.5) 55%, rgba(190,24,93,0.25));
+  -webkit-clip-path: url(#heart-shape-clip);
+  clip-path: url(#heart-shape-clip);
+  filter: blur(12px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+.heart-photo {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  -webkit-clip-path: url(#heart-shape-clip);
+  clip-path: url(#heart-shape-clip);
+  box-shadow: 0 28px 60px rgba(156,23,77,0.28);
+  opacity: 0.08;
+  transform: translateY(22px) scale(0.94);
+  filter: blur(10px) saturate(0.75);
+  cursor: pointer;
+  transition: transform 500ms cubic-bezier(.2,.9,.3,1), filter 500ms ease;
+}
+.heart-photo.reveal-heart {
+  animation: heartCenterReveal 3.6s cubic-bezier(0.2,0.9,0.3,1) forwards;
+}
+.surprise-ring {
+  position: fixed; left: 50%; top: 50%;
+  width: 130px; height: 130px;
+  border: 6px solid rgba(244,114,182,0.9);
+  border-radius: 9999px;
+  pointer-events: none; z-index: 20;
+  animation: burstRing 1400ms ease-out forwards;
+  box-shadow: 0 0 0 10px rgba(251,113,133,0.2);
+}
+.surprise-flash {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 19;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.72), rgba(253,242,248,0.2) 45%, rgba(253,242,248,0));
+  animation: softFlash 1100ms ease-out forwards;
+}
+.petal-fall {
+  position: fixed; top: 0;
+  pointer-events: none; z-index: 18;
+  animation: petalFall linear forwards;
+}
+.float-heart {
+  animation: floatUp 3.5s ease-out forwards;
+  position: absolute; pointer-events: none;
+}
+.pop-in { animation: popIn 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.shimmer-text {
+  background: linear-gradient(90deg,#ec4899,#f59e0b,#ec4899);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+.btn-glow { animation: pulse-glow 2s infinite; }
+.sparkle { animation: sparkle 1.5s ease-in-out infinite; position: absolute; pointer-events: none; }
+.heartbeat { animation: heartbeat 1.5s infinite; }
+.slide-up { animation: slideUp 0.6s ease-out forwards; }
+.confetti-piece { animation: confetti linear forwards; position: fixed; pointer-events: none; }
+.orbit-flower { animation: orbitFlower ease-out forwards; position: absolute; pointer-events: none; }
+.gentle-float { animation: gentle-float 3s ease-in-out infinite; }
+.subtle-glow { animation: subtle-glow 2.5s ease-in-out infinite; }
+.slow-twinkle { animation: slow-twinkle 3s ease-in-out infinite; }
+.background-stars { position: absolute; font-size: 1.5rem; opacity: 0.4; pointer-events: none; animation: slow-twinkle 2s ease-in-out infinite; }
+body { box-sizing: border-box; margin: 0; padding: 0; }
+
+.hidden {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ── MOBILE RESPONSIVENESS ── */
+@media (max-width: 768px) {
+  #pre-click {
+    padding: 4rem 1.5rem !important;
+  }
+  #pre-click h1 {
+    font-size: 1.75rem !important;
+  }
+  #pre-click p {
+    font-size: 1rem !important;
+  }
+  #pre-click button {
+    padding: 0.75rem 1.5rem !important;
+    font-size: 1rem !important;
+  }
+  
+  #post-click {
+    padding: 2rem 1rem !important;
+  }
+  
+  #wish-content {
+    max-width: 100vw;
+    padding: 0 1rem;
+    width: 100%;
+  }
+  
+  #main-msg {
+    font-size: 2rem !important;
+    line-height: 1.3;
+    word-wrap: break-word;
+  }
+  
+  #sub-msg {
+    font-size: 0.95rem !important;
+    padding: 0 1rem;
+    max-width: 90vw !important;
+  }
+  
+  .heart-photo-shell {
+    width: min(85vw, 280px) !important;
+    margin: 1rem auto;
+  }
+  
+  #photo-wrap {
+    margin: 1.5rem 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #pre-click {
+    padding: 3rem 1rem !important;
+  }
+  #pre-click .heartbeat {
+    font-size: 3rem !important;
+  }
+  #pre-click h1 {
+    font-size: 1.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+  #pre-click p {
+    font-size: 0.9rem !important;
+  }
+  #pre-click button {
+    padding: 0.6rem 1.2rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  #post-click {
+    padding: 1.5rem 0.75rem !important;
+  }
+  
+  #wish-content {
+    margin-top: 0 !important;
+    width: 100%;
+  }
+  
+  #main-msg {
+    font-size: 1.5rem !important;
+    margin-bottom: 1rem !important;
+    line-height: 1.2;
+  }
+  
+  #sub-msg {
+    font-size: 0.85rem !important;
+    padding: 0 0.75rem;
+    max-width: 95vw !important;
+    line-height: 1.5;
+  }
+  
+  .heart-photo-shell {
+    width: min(90vw, 240px) !important;
+    margin: 1rem auto 0.5rem;
+  }
+  
+  #photo-wrap {
+    margin: 1rem 0 0.5rem !important;
+  }
+  
+  .float-heart { font-size: 1rem !important; }
+}
+</style>
+</head>
+<body class="h-full">
+<svg width="0" height="0" style="position:absolute;visibility:hidden" aria-hidden="true" focusable="false">
+  <defs>
+    <clipPath id="heart-shape-clip" clipPathUnits="objectBoundingBox">
+      <path d="M0.5,0.95 C0.15,0.72 0.02,0.52 0.05,0.33 C0.08,0.14 0.23,0.02 0.38,0.05 C0.45,0.07 0.49,0.11 0.5,0.16 C0.51,0.11 0.55,0.07 0.62,0.05 C0.77,0.02 0.92,0.14 0.95,0.33 C0.98,0.52 0.85,0.72 0.5,0.95 Z"></path>
+    </clipPath>
+  </defs>
+</svg>
+
+<div id="app" class="w-full flex items-center justify-center min-h-screen" style="background: linear-gradient(135deg,#fdf2f8 0%,#fce7f3 30%,#fbcfe8 60%,#f9a8d4 100%); padding: 0; margin: 0; overflow: hidden;">
+  <div id="pre-click" class="text-center p-8 w-full" style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center;">
+    <div class="heartbeat inline-block text-7xl mb-6">💐</div>
+    <h1 style="font-family:'Dancing Script',cursive;font-size:2.5rem;color:#be185d;" class="mb-4">A Special Surprise Awaits...</h1>
+    <p style="font-family:'Quicksand',sans-serif;color:#9d174d;" class="mb-8 text-lg">Click the button to reveal your wish!</p>
+    <button onclick="revealSurprise()" class="btn-glow px-10 py-4 rounded-full text-white text-xl font-semibold cursor-pointer border-none transition-all duration-300 hover:scale-110" style="font-family:'Quicksand',sans-serif;background:linear-gradient(135deg,#ec4899,#f43f5e);max-width:300px;width:fit-content;margin:0 auto;display:block;">
+      🌸 Open Your Surprise 🌸
+    </button>
+  </div>
+
+  <div id="post-click" class="hidden text-center p-8 relative w-full h-full flex flex-col items-center justify-center overflow-y-auto overflow-x-hidden" style="scroll-behavior: smooth; max-height: 100vh; position: absolute; inset: 0;">
+    <div id="heart-wave-layer" class="heart-wave-layer"></div>
+    <div id="background-stars" class="absolute inset-0 pointer-events-none"></div>
+    <div id="hearts-container" class="absolute inset-0 pointer-events-none"></div>
+    <div id="sparkles-container" class="absolute inset-0 pointer-events-none"></div>
+    <div id="confetti-container" class="fixed inset-0 pointer-events-none overflow-hidden"></div>
+    <div id="orbit-flowers-container" class="absolute inset-0 pointer-events-none"></div>
+
+    <div id="wish-content" class="relative z-10 opacity-0">
+      <div class="mb-6 pop-in gentle-float subtle-glow" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <div style="font-size:3.2rem;line-height:1;">👑</div>
+        <div style="font-family:'Quicksand',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:0.08em;color:#be185d;text-transform:uppercase;">For Mom</div>
+      </div>
+      <div id="photo-wrap" class="mb-6" style="display:flex;align-items:center;justify-content:center;">
+        <div class="heart-photo-shell" id="heart-shell">
+          <div class="heart-photo-glow"></div>
+          <img id="mom-photo" class="heart-photo" src="https://drive.google.com/thumbnail?id=1UPR4A69yh5kkIB2ejnXasXvEBGPfZfon&sz=w1200" alt="Mom" />
+        </div>
+        <div id="photo-fallback" style="display:none;max-width:380px;background:rgba(255,255,255,0.85);border:2px dashed #ec4899;border-radius:16px;padding:16px 18px;color:#9d174d;font-family:'Quicksand',sans-serif;">
+          <p style="margin:0 0 10px 0;font-weight:600;">Photo could not be loaded.</p>
+          <p style="margin:0;font-size:14px;">Please set file sharing to <strong>Anyone with the link</strong> and refresh.</p>
+        </div>
+      </div>
+      <p id="sub-msg" class="slide-up text-lg mt-4 max-w-md mx-auto" style="font-family:'Quicksand',sans-serif;color:#9d174d;animation-delay:0.4s;opacity:0;line-height:1.6;">என்னை விட என்மேல் அதிக நம்பிக்கை வைத்தது நீ தான் அம்மா.<br>என் ஒவ்வொரு வெற்றிக்கும் பின்னால் உன் நம்பிக்கையும் இருக்கிறது.</p>
+      <h1 id="main-msg" class="shimmer-text mb-4 mt-6" style="font-family:'Quicksand',sans-serif;font-size:3.5rem;font-weight:700;">இனிய அன்னையர் தின வாழ்த்துக்கள் அம்மா ❤️</h1>
+      <div style="margin-top: 2rem; padding-bottom: 2rem;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SUBTLE HEART WAVE ENGINE ──────────────────────────────────────────────────
+// Heart path centred at (50,50) in a 100×100 viewBox
+const HEART_D = "M50,88 C14,65 1,44 4,25 C7,6 22,-5 37,-2 C44,0 48,5 50,10 C52,5 56,0 63,-2 C78,-5 93,6 96,25 C99,44 86,65 50,88 Z";
+
+let waveActive = false;
+let waveTimer  = null;
+
+// How many px the heart is at scale=1 (we treat the 100-unit box as covering the viewport diagonal)
+function calcEndScale() {
+  const cx = window.innerWidth  / 2;
+  const cy = window.innerHeight / 2;
+  const maxDist = Math.hypot(Math.max(cx, window.innerWidth - cx), Math.max(cy, window.innerHeight - cy));
+  // at scale=1 the heart box is 100×100 px; half-diagonal ≈ 70px
+  return (maxDist / 70) * 1.15;
+}
+
+function spawnWave() {
+  const layer = document.getElementById('heart-wave-layer');
+  if (!layer) return;
+
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.setAttribute("width",  "100");
+  svg.setAttribute("height", "100");
+  svg.classList.add("heart-wave-svg");
+  svg.style.overflow = "visible";
+
+  const endScale = calcEndScale();
+  svg.style.setProperty("--hw-end-scale", endScale);
+
+  // vary duration slightly for organic feel
+  const dur = 3200 + Math.random() * 600;
+  svg.style.animationDuration = dur + "ms";
+  svg.style.animationTimingFunction = "cubic-bezier(0.15, 0.5, 0.45, 1)";
+
+  const path = document.createElementNS(svgNS, "path");
+  path.setAttribute("d", HEART_D);
+  // very thin, very faint — just a whisper of a heart
+  path.style.stroke = "rgba(236, 72, 153, 0.22)";
+  path.style.strokeWidth = "1.2";
+  path.style.fill = "none";
+
+  svg.appendChild(path);
+  layer.appendChild(svg);
+
+  setTimeout(() => svg.remove(), dur + 200);
+}
+
+function startWaves() {
+  if (waveActive) return;
+  waveActive = true;
+  spawnWave();
+  // stagger: first few waves closer together, then settle into rhythm
+  let spawned = 1;
+  const intervals = [600, 700, 750, 800];
+  function next() {
+    spawnWave();
+    spawned++;
+    const gap = spawned < intervals.length ? intervals[spawned] : 820;
+    waveTimer = setTimeout(next, gap);
+  }
+  waveTimer = setTimeout(next, intervals[0]);
+}
+
+// ── REVEAL ────────────────────────────────────────────────────────────────────
+function revealSurprise() {
+  document.getElementById('pre-click').classList.add('hidden');
+  const post = document.getElementById('post-click');
+  post.classList.remove('hidden');
+  post.style.display = 'flex';
+  post.style.visibility = 'visible';
+  post.style.height = 'auto';
+  post.style.overflow = 'auto';
+
+  const container = document.getElementById('hearts-container');
+  const hearts = ['💖','💗','💕','❤️','🩷','🦋'];
+  for (let i = 0; i < 30; i++) {
+    setTimeout(() => {
+      const h = document.createElement('div');
+      h.className = 'float-heart';
+      h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+      h.style.left = Math.random()*100+'%';
+      h.style.bottom = '0';
+      h.style.fontSize = (Math.random()*30+20)+'px';
+      h.style.animationDuration = (Math.random()*2+2.5)+'s';
+      container.appendChild(h);
+      setTimeout(() => h.remove(), 4000);
+    }, i*150);
+  }
+
+  const sparklesContainer = document.getElementById('sparkles-container');
+  for (let i = 0; i < 15; i++) {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.textContent = '✨';
+    s.style.left = Math.random()*100+'%';
+    s.style.top  = Math.random()*100+'%';
+    s.style.fontSize = (Math.random()*16+12)+'px';
+    s.style.animationDelay = Math.random()*2+'s';
+    sparklesContainer.appendChild(s);
+  }
+
+  const confettiContainer = document.getElementById('confetti-container');
+  const pieces = ['🎉','⭐','✨','🌟','💫'];
+  for (let i = 0; i < 40; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.textContent = pieces[Math.floor(Math.random()*pieces.length)];
+      c.style.left = '50%'; c.style.top = '30%';
+      c.style.fontSize = (Math.random()*24+16)+'px';
+      const a = (Math.PI*2*i)/40, d = 150+Math.random()*150;
+      c.style.setProperty('--tx', Math.cos(a)*d+'px');
+      c.style.setProperty('--ty', Math.sin(a)*d+'px');
+      c.style.animationDuration = (Math.random()*1.5+1.5)+'s';
+      confettiContainer.appendChild(c);
+      setTimeout(() => c.remove(), 3500);
+    }, i*50);
+  }
+
+  const orbitContainer = document.getElementById('orbit-flowers-container');
+  const flowers = ['🌷','🌹','🌸','💐','🌺','🌼'];
+  for (let i = 0; i < 12; i++) {
+    setTimeout(() => {
+      const f = document.createElement('div');
+      f.className = 'orbit-flower';
+      f.textContent = flowers[i%flowers.length];
+      f.style.left = '50%'; f.style.top = '50%';
+      f.style.fontSize = (Math.random()*28+20)+'px';
+      const a = (Math.PI*2*i)/12, r = 120+Math.random()*60;
+      f.style.setProperty('--ox', Math.cos(a)*r+'px');
+      f.style.setProperty('--oy', Math.sin(a)*r+'px');
+      f.style.animationDuration = (1.2+Math.random()*0.8)+'s';
+      f.style.animationDelay = (i*0.1)+'s';
+      orbitContainer.appendChild(f);
+      setTimeout(() => f.remove(), 2500);
+    }, i*100);
+  }
+
+  setTimeout(() => {
+    const w = document.getElementById('wish-content');
+    w.style.opacity = '1';
+    w.classList.add('pop-in');
+  }, 500);
+
+  launchSurpriseBurst();
+  spawnPetalRain(28);
+
+  const bgStars = document.getElementById('background-stars');
+  const starEmojis = ['⭐','✨','💫','🌟'];
+  for (let i = 0; i < 15; i++) {
+    const s = document.createElement('div');
+    s.className = 'background-stars';
+    s.textContent = starEmojis[Math.floor(Math.random()*starEmojis.length)];
+    s.style.left = Math.random()*100+'%';
+    s.style.top  = Math.random()*100+'%';
+    s.style.animationDelay = (Math.random()*3)+'s';
+    bgStars.appendChild(s);
+  }
+
+  const photo = document.getElementById('mom-photo');
+  if (photo) {
+    photo.addEventListener('error', () => {
+      document.getElementById('photo-fallback').style.display = 'block';
+      photo.style.display = 'none';
+    });
+    setTimeout(() => {
+      photo.classList.add('reveal-heart');
+      photo.style.boxShadow = '0 30px 60px rgba(236,72,153,0.2)';
+    }, 750);
+    setTimeout(() => emitPhotoHearts(photo, 18), 3200);
+    photo.addEventListener('click', () => togglePhotoFancy(photo));
+  }
+
+  // start heart waves — slight delay so initial burst settles first
+  setTimeout(startWaves, 1000);
+}
+
+function emitPhotoHearts(photoEl, count) {
+  const rect = photoEl.getBoundingClientRect();
+  const container = document.getElementById('hearts-container');
+  const emojis = ['💖','💗','💕','🩷'];
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.cssText = `position:fixed;pointer-events:none;opacity:1;font-size:${10+Math.random()*24}px;left:${rect.left+rect.width*(0.2+Math.random()*0.6)}px;top:${rect.top+rect.height*(0.6+Math.random()*0.2)}px;transform:translateY(0) scale(0.8);transition:transform 1200ms cubic-bezier(.2,.9,.3,1),opacity 1200ms ease;`;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.style.transform = `translate(${(Math.random()-0.5)*120}px,${-(100+Math.random()*180)}px) scale(1)`;
+      el.style.opacity = '0';
+    }, 50+i*30);
+    setTimeout(() => el.remove(), 1500+i*30);
+  }
+}
+
+let photoFancy = false;
+function togglePhotoFancy(photoEl) {
+  photoFancy = !photoFancy;
+  if (photoFancy) {
+    photoEl.style.filter = 'saturate(1.15) drop-shadow(0 30px 60px rgba(236,72,153,0.25))';
+    photoEl.style.transform = 'translateY(-6px) scale(1.06) rotate(-1deg)';
+    photoEl.style.transition = 'transform 500ms cubic-bezier(.2,.9,.3,1),filter 500ms ease';
+  } else {
+    photoEl.style.filter = 'none';
+    photoEl.style.transform = 'translateY(0) scale(1) rotate(0deg)';
+  }
+}
+
+function launchSurpriseBurst() {
+  const flash = document.createElement('div'); flash.className = 'surprise-flash';
+  const ring  = document.createElement('div'); ring.className  = 'surprise-ring';
+  document.body.appendChild(flash); document.body.appendChild(ring);
+  setTimeout(() => flash.remove(), 1200);
+  setTimeout(() => ring.remove(),  1500);
+}
+
+function spawnPetalRain(count) {
+  const petals = ['🌸','🌺','🌷','✨'];
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'petal-fall';
+      p.textContent = petals[Math.floor(Math.random()*petals.length)];
+      p.style.left = Math.random()*100+'vw';
+      p.style.fontSize = (16+Math.random()*20)+'px';
+      p.style.setProperty('--driftX', ((Math.random()-0.5)*180)+'px');
+      p.style.animationDuration = (3.6+Math.random()*2.2)+'s';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 6200);
+    }, i*130);
+  }
+}
+</script>
+</body>
+</html>
