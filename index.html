@@ -132,9 +132,9 @@
   -webkit-clip-path: url(#heart-shape-clip);
   clip-path: url(#heart-shape-clip);
   box-shadow: 0 28px 60px rgba(156,23,77,0.28);
-  opacity: 0.08;
-  transform: translateY(22px) scale(0.94);
-  filter: blur(10px) saturate(0.75);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: saturate(1);
   cursor: pointer;
   transition: transform 500ms cubic-bezier(.2,.9,.3,1), filter 500ms ease;
 }
@@ -331,7 +331,7 @@ body { box-sizing: border-box; margin: 0; padding: 0; }
       <div id="photo-wrap" class="mb-6" style="display:flex;align-items:center;justify-content:center;">
         <div class="heart-photo-shell" id="heart-shell">
           <div class="heart-photo-glow"></div>
-           <img id="mom-photo" class="heart-photo" src="https://drive.google.com/thumbnail?id=1UPR4A69yh5kkIB2ejnXasXvEBGPfZfon&sz=w1200" alt="Mom" onerror="showPhotoFallback()" />
+            <img id="mom-photo" class="heart-photo" src="https://drive.google.com/thumbnail?id=1UPR4A69yh5kkIB2ejnXasXvEBGPfZfon&sz=w1200" alt="Mom" />
         </div>
          <div id="photo-fallback" style="display:none;max-width:90vw;background:rgba(255,255,255,0.9);border:3px dashed #ec4899;border-radius:16px;padding:24px 20px;color:#9d174d;font-family:'Quicksand',sans-serif;text-align:center;">
            <p style="margin:0 0 12px 0;font-weight:700;font-size:1rem;">💝 Photo</p>
@@ -348,12 +348,34 @@ body { box-sizing: border-box; margin: 0; padding: 0; }
 </div>
 
 <script>
+const PHOTO_FILE_ID = '1UPR4A69yh5kkIB2ejnXasXvEBGPfZfon';
+const PHOTO_SOURCES = [
+  `https://drive.google.com/thumbnail?id=${PHOTO_FILE_ID}&sz=w1200`,
+  `https://drive.google.com/uc?export=view&id=${PHOTO_FILE_ID}`,
+  `https://lh3.googleusercontent.com/d/${PHOTO_FILE_ID}=w1200`
+];
+
 // Show photo fallback when image fails to load
 function showPhotoFallback() {
   const photoShell = document.getElementById('heart-shell');
   const fallback = document.getElementById('photo-fallback');
   if (photoShell) photoShell.style.display = 'none';
   if (fallback) fallback.style.display = 'block';
+}
+
+function setupPhotoSourceFallback(photo) {
+  let sourceIndex = 0;
+  if (!photo) return;
+
+  photo.src = PHOTO_SOURCES[sourceIndex];
+  photo.addEventListener('error', () => {
+    sourceIndex += 1;
+    if (sourceIndex < PHOTO_SOURCES.length) {
+      photo.src = PHOTO_SOURCES[sourceIndex];
+      return;
+    }
+    showPhotoFallback();
+  });
 }
 
 // ── SUBTLE HEART WAVE ENGINE ──────────────────────────────────────────────────
@@ -519,7 +541,7 @@ function revealSurprise() {
 
   const photo = document.getElementById('mom-photo');
   if (photo) {
-     photo.addEventListener('error', showPhotoFallback);
+    setupPhotoSourceFallback(photo);
     setTimeout(() => {
       photo.classList.add('reveal-heart');
       photo.style.boxShadow = '0 30px 60px rgba(236,72,153,0.2)';
