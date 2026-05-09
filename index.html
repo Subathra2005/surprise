@@ -331,11 +331,12 @@ body { box-sizing: border-box; margin: 0; padding: 0; }
       <div id="photo-wrap" class="mb-6" style="display:flex;align-items:center;justify-content:center;">
         <div class="heart-photo-shell" id="heart-shell">
           <div class="heart-photo-glow"></div>
-          <img id="mom-photo" class="heart-photo" src="https://drive.google.com/thumbnail?id=1UPR4A69yh5kkIB2ejnXasXvEBGPfZfon&sz=w1200" alt="Mom" />
+           <img id="mom-photo" class="heart-photo" src="https://drive.google.com/thumbnail?id=1UPR4A69yh5kkIB2ejnXasXvEBGPfZfon&sz=w1200" alt="Mom" onerror="showPhotoFallback()" />
         </div>
-        <div id="photo-fallback" style="display:none;max-width:380px;background:rgba(255,255,255,0.85);border:2px dashed #ec4899;border-radius:16px;padding:16px 18px;color:#9d174d;font-family:'Quicksand',sans-serif;">
-          <p style="margin:0 0 10px 0;font-weight:600;">Photo could not be loaded.</p>
-          <p style="margin:0;font-size:14px;">Please set file sharing to <strong>Anyone with the link</strong> and refresh.</p>
+         <div id="photo-fallback" style="display:none;max-width:90vw;background:rgba(255,255,255,0.9);border:3px dashed #ec4899;border-radius:16px;padding:24px 20px;color:#9d174d;font-family:'Quicksand',sans-serif;text-align:center;">
+           <p style="margin:0 0 12px 0;font-weight:700;font-size:1rem;">💝 Photo</p>
+           <p style="margin:0 0 10px 0;font-weight:600;font-size:0.95rem;">Could not load from Google Drive</p>
+           <p style="margin:0;font-size:0.85rem;opacity:0.8;">Please ensure file sharing is set to <strong>Anyone with the link</strong></p>
         </div>
       </div>
       <p id="sub-msg" class="slide-up text-lg mt-4 max-w-md mx-auto" style="font-family:'Quicksand',sans-serif;color:#9d174d;animation-delay:0.4s;opacity:0;line-height:1.6;">என்னை விட என்மேல் அதிக நம்பிக்கை வைத்தது நீ தான் அம்மா.<br>என் ஒவ்வொரு வெற்றிக்கும் பின்னால் உன் நம்பிக்கையும் இருக்கிறது.</p>
@@ -347,6 +348,14 @@ body { box-sizing: border-box; margin: 0; padding: 0; }
 </div>
 
 <script>
+// Show photo fallback when image fails to load
+function showPhotoFallback() {
+  const photoShell = document.getElementById('heart-shell');
+  const fallback = document.getElementById('photo-fallback');
+  if (photoShell) photoShell.style.display = 'none';
+  if (fallback) fallback.style.display = 'block';
+}
+
 // ── SUBTLE HEART WAVE ENGINE ──────────────────────────────────────────────────
 // Heart path centred at (50,50) in a 100×100 viewBox
 const HEART_D = "M50,88 C14,65 1,44 4,25 C7,6 22,-5 37,-2 C44,0 48,5 50,10 C52,5 56,0 63,-2 C78,-5 93,6 96,25 C99,44 86,65 50,88 Z";
@@ -510,10 +519,7 @@ function revealSurprise() {
 
   const photo = document.getElementById('mom-photo');
   if (photo) {
-    photo.addEventListener('error', () => {
-      document.getElementById('photo-fallback').style.display = 'block';
-      photo.style.display = 'none';
-    });
+     photo.addEventListener('error', showPhotoFallback);
     setTimeout(() => {
       photo.classList.add('reveal-heart');
       photo.style.boxShadow = '0 30px 60px rgba(236,72,153,0.2)';
